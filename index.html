@@ -1,187 +1,325 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>减肥规划器</title>
+    <title>身材管理器</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             padding: 20px;
         }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        input {
+        .container {
+            background: white;
+            max-width: 800px;
             width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
+        .title {
+            text-align: center;
+            color: #1a73e8;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input, .select-target {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .target-btn {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn.active {
+            background: #1a73e8;
+            color: white;
+        }
+
+        #generateBtn {
+            width: 100%;
+            padding: 12px;
+            background: #1a73e8;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        #result {
+            font-size: 16px;
             margin-top: 20px;
-            opacity: 0;
-            transition: opacity 0.5s ease;
         }
 
-       .show-result {
-            opacity: 1;
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
         }
 
-       .task {
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+        .result {
+            margin-top: 30px;
+            display: none;
         }
 
-       .task.completed {
-            background-color: #d4edda;
-            color: #28a745;
-            text-decoration: line-through;
+        .plan-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .plan-title {
+            color: #1a73e8;
+            margin-bottom: 15px;
+        }
+
+        .daily-plan {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .daily-item {
+            background: white;
+            padding: 18px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
-
 <body>
-    <h1>减肥规划器</h1>
-    <form id="planForm">
-        <label for="weight">当前体重（kg）</label>
-        <input type="number" id="weight" placeholder="请输入当前体重" required>
+    <div class="container">
+        <h2 class="title">身材管理计划生成器</h2>
+        <form id="bodyForm">
+            <div class="form-group">
+                <label>当前体重（kg）</label>
+                <input type="number" id="weight" placeholder="请输入当前体重" required>
+            </div>
 
-        <label for="height">身高（cm）</label>
-        <input type="number" id="height" placeholder="请输入身高" required>
+            <div class="form-group">
+                <label>身高（cm）</label>
+                <input type="number" id="height" placeholder="请输入身高" required>
+            </div>
 
-        <label for="age">年龄</label>
-        <input type="number" id="age" placeholder="请输入年龄" required>
+            <div class="form-group">
+                <label>年龄</label>
+                <input type="number" id="age" placeholder="请输入年龄" required>
+            </div>
 
-        <label for="targetWeight">目标体重（kg）</label>
-        <input type="number" id="targetWeight" placeholder="请输入目标体重" required>
+            <div class="form-group">
+                <label>目标类型</label>
+                <div class="target-btn">
+                    <button class="btn active" data-target="lose">减肥</button>
+                    <button class="btn" data-target="gain">增肌</button>
+                    <button class="btn" data-target="shape">塑形</button>
+                </div>
+            </div>
 
-        <label for="time">计划减肥时间（月）</label>
-        <input type="number" id="time" placeholder="请输入计划减肥时间" required>
+            <div class="form-group" id="targetInputGroup">
+                <!-- 目标值输入框将动态生成 -->
+            </div>
 
-        <button type="submit">生成减肥规划</button>
-    </form>
-    <div id="result"></div>
+            <div class="loading">生成中...</div>
+            <button type="submit" id="generateBtn">生成专属计划</button>
+        </form>
+
+        <div class="result" id="resultArea">
+            <div class="plan-card">
+                <h3 class="plan-title">基础指标分析</h3>
+                <p><strong>BMI</strong>: <span id="bmiValue"></span></p>
+                <p><strong>目标</strong>: <span id="targetDesc"></span></p>
+            </div>
+
+            <div class="plan-card">
+                <h3 class="plan-title">每日饮食计划</h3>
+                <div id="dietPlan"></div>
+            </div>
+
+            <div class="plan-card">
+                <h3 class="plan-title">每周运动计划</h3>
+                <div id="exercisePlan"></div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        document.getElementById('planForm').addEventListener('submit', function (e) {
+        // 目标类型配置
+        const TARGET_CONFIG = {
+            lose: {
+                name: "减肥",
+                unit: "kg",
+                placeholder: "请输入目标体重（低于当前体重）"
+            },
+            gain: {
+                name: "增肌",
+                unit: "kg",
+                placeholder: "请输入目标体重（高于当前体重）"
+            },
+            shape: {
+                name: "塑形",
+                unit: "%",
+                placeholder: "请输入目标体脂率（如20）"
+            }
+        };
+
+        // 饮食/运动库
+        const DIET_LIBRARY = {
+            lose: ["鸡胸肉沙拉", "燕麦粥", "清蒸鱼", "西兰花炒虾仁"],
+            gain: ["牛肉炒饭", "蛋白粉奶昔", "坚果拼盘", "全麦面包"],
+            shape: ["三文鱼", "希腊酸奶", "藜麦沙拉", "水煮蛋"]
+        };
+
+        const EXERCISE_LIBRARY = {
+            lose: ["慢跑", "跳绳", "HIIT"],
+            gain: ["举重", "深蹲", "卧推"],
+            shape: ["瑜伽", "普拉提", "动感单车"]
+        };
+
+        // 初始化目标输入框
+        function initTargetInput() {
+            const targetInputGroup = document.getElementById('targetInputGroup');
+            targetInputGroup.innerHTML = ``; // 清空旧内容
+
+            const btns = document.querySelectorAll('.btn');
+            btns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    btns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const target = this.dataset.target;
+                    renderTargetInput(target);
+                });
+            });
+
+            // 默认选中第一个按钮
+            document.querySelector('[data-target="lose"]').classList.add('active');
+            renderTargetInput('lose');
+        }
+
+        // 渲染目标输入框
+        function renderTargetInput(target) {
+            const config = TARGET_CONFIG[target];
+            const targetInputGroup = document.getElementById('targetInputGroup');
+            targetInputGroup.innerHTML = `
+                <label>目标值${config.unit}</label>
+                <input type="number" id="targetValue" placeholder="${config.placeholder}" required>
+            `;
+        }
+
+        // 计算BMI
+        function calculateBMI(weight, height) {
+            return (weight / ((height / 100) ** 2)).toFixed(1);
+        }
+
+        // 生成饮食计划
+        function generateDietPlan(target) {
+            const items = DIET_LIBRARY[target].map(item => `<div class="daily-item">${item}</div>`);
+            return items.join('');
+        }
+
+        // 生成运动计划
+        function generateExercisePlan(target, age) {
+            const exercises = EXERCISE_LIBRARY[target];
+            const plan = exercises.map((item, index) => `
+                <div class="daily-item">
+                    <strong>第${index+1}天</strong>: ${item} (30-45分钟)
+                </div>
+            `);
+            return plan.join('');
+        }
+
+        // 主函数：生成计划
+        async function generatePlan(e) {
             e.preventDefault();
+            const loading = document.querySelector('.loading');
+            const resultArea = document.getElementById('resultArea');
             const weight = parseFloat(document.getElementById('weight').value);
             const height = parseFloat(document.getElementById('height').value);
             const age = parseInt(document.getElementById('age').value);
-            const targetWeight = parseFloat(document.getElementById('targetWeight').value);
-            const time = parseInt(document.getElementById('time').value);
+            const targetBtn = document.querySelector('.btn.active');
+            const target = targetBtn.dataset.target;
+            const targetValue = parseFloat(document.getElementById('targetValue').value);
+            const bmi = calculateBMI(weight, height);
 
-            // 计算BMI
-            const bmi = weight / ((height / 100) ** 2);
+            // 显示加载状态
+            loading.style.display = "block";
+            resultArea.style.display = "none";
+            document.getElementById('generateBtn').disabled = true;
 
-            // 简单计算每月需减重数
-            const weightToLosePerMonth = (weight - targetWeight) / time;
+            // 模拟异步计算（实际可移除）
+            await new Promise(resolve => setTimeout(resolve, 1500));
 
-            let dietSuggestion = "";
-            let exerciseType = "";
-            let exerciseDuration = "";
-            let exerciseTime = "";
+            // 生成结果
+            const targetDesc = `${TARGET_CONFIG[target].name}：${targetValue}${TARGET_CONFIG[target].unit}`;
+            const dietHtml = generateDietPlan(target);
+            const exerciseHtml = generateExercisePlan(target, age);
 
-            // 根据BMI和减重需求给出饮食建议
-            if (bmi > 28) {
-                dietSuggestion = "建议采用低热量、高纤维饮食，增加蔬菜、水果、全谷物摄入，控制碳水化合物和脂肪摄入，例如早餐可食用燕麦粥、水煮蛋和水果；午餐选择糙米饭、清炒时蔬和瘦肉；晚餐以蔬菜沙拉和清蒸鱼为主。";
-            } else {
-                dietSuggestion = "保持均衡饮食，适当控制热量摄入，多吃富含蛋白质、维生素和矿物质的食物，如鸡胸肉、鱼虾、各类蔬菜和水果。";
-            }
+            // 渲染结果
+            document.getElementById('bmiValue').textContent = bmi;
+            document.getElementById('targetDesc').textContent = targetDesc;
+            document.getElementById('dietPlan').innerHTML = dietHtml;
+            document.getElementById('exercisePlan').innerHTML = exerciseHtml;
 
-            // 根据年龄和减重需求给出运动建议
-            if (age < 30) {
-                exerciseType = "可以选择高强度间歇训练（HIIT）、力量训练结合有氧运动，如每周进行3次HIIT训练，每次20分钟；2次力量训练，每次30分钟；3次30分钟的慢跑或游泳。";
-            } else if (age < 50) {
-                exerciseType = "推荐有氧运动和适度力量训练，比如每周4次30 - 40分钟的快走、骑自行车或跳绳，2次20分钟的简单力量练习，如平板支撑、深蹲。";
-            } else {
-                exerciseType = "适合较为温和的运动，如每天进行40分钟的散步，每周2 - 3次20分钟的瑜伽或太极拳练习。";
-            }
+            // 隐藏加载，显示结果
+            loading.style.display = "none";
+            resultArea.style.display = "block";
+            document.getElementById('generateBtn').disabled = false;
+        }
 
-            // 运动时长和时间安排
-            exerciseDuration = "每次运动时间根据上述建议执行。";
-            exerciseTime = "建议将运动时间分散在一周内，不要集中在某一天，以保持身体的适应性和避免过度疲劳。";
-
-            // 按天拆分任务
-            const daysInMonth = 30; // 这里简单按每月30天计算，可优化为准确计算每月天数
-            const dietTasks = [];
-            const exerciseTasks = [];
-            for (let i = 1; i <= daysInMonth; i++) {
-                dietTasks.push(`第${i}天饮食任务：遵循今日饮食建议`);
-                exerciseTasks.push(`第${i}天运动任务：完成今日运动计划`);
-            }
-
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = `
-                <h2>减肥规划结果</h2>
-                <h3>饮食搭配建议：</h3>
-                <p>${dietSuggestion}</p>
-                <h3>运动类型建议：</h3>
-                <p>${exerciseType}</p>
-                <h3>运动时长建议：</h3>
-                <p>${exerciseDuration}</p>
-                <h3>运动时间建议：</h3>
-                <p>${exerciseTime}</p>
-                <h3>每日任务</h3>
-                <div id="dietTasks">
-                    <h4>饮食任务</h4>
-                    <!-- 这里动态插入饮食任务 -->
-                </div>
-                <div id="exerciseTasks">
-                    <h4>运动任务</h4>
-                    <!-- 这里动态插入运动任务 -->
-                </div>
-            `;
-
-            const dietTasksDiv = document.getElementById('dietTasks');
-            const exerciseTasksDiv = document.getElementById('exerciseTasks');
-            dietTasks.forEach(task => {
-                const taskElement = document.createElement('div');
-                taskElement.classList.add('task');
-                taskElement.textContent = task;
-                taskElement.addEventListener('click', function () {
-                    this.classList.toggle('completed');
-                });
-                dietTasksDiv.appendChild(taskElement);
-            });
-            exerciseTasks.forEach(task => {
-                const taskElement = document.createElement('div');
-                taskElement.classList.add('task');
-                taskElement.textContent = task;
-                taskElement.addEventListener('click', function () {
-                    this.classList.toggle('completed');
-                });
-                exerciseTasksDiv.appendChild(taskElement);
-            });
-
-            resultDiv.classList.add('show-result');
-        });
+        // 初始化
+        initTargetInput();
+        document.getElementById('bodyForm').addEventListener('submit', generatePlan);
     </script>
 </body>
-
 </html>
