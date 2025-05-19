@@ -31,6 +31,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         button:hover {
@@ -39,6 +40,27 @@
 
         #result {
             margin-top: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+       .show-result {
+            opacity: 1;
+        }
+
+       .task {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+       .task.completed {
+            background-color: #d4edda;
+            color: #28a745;
+            text-decoration: line-through;
         }
     </style>
 </head>
@@ -105,14 +127,59 @@
             exerciseDuration = "每次运动时间根据上述建议执行。";
             exerciseTime = "建议将运动时间分散在一周内，不要集中在某一天，以保持身体的适应性和避免过度疲劳。";
 
+            // 按天拆分任务
+            const daysInMonth = 30; // 这里简单按每月30天计算，可优化为准确计算每月天数
+            const dietTasks = [];
+            const exerciseTasks = [];
+            for (let i = 1; i <= daysInMonth; i++) {
+                dietTasks.push(`第${i}天饮食任务：遵循今日饮食建议`);
+                exerciseTasks.push(`第${i}天运动任务：完成今日运动计划`);
+            }
+
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = `
                 <h2>减肥规划结果</h2>
-                <p><strong>饮食搭配建议：</strong><br>${dietSuggestion}</p>
-                <p><strong>运动类型建议：</strong><br>${exerciseType}</p>
-                <p><strong>运动时长建议：</strong><br>${exerciseDuration}</p>
-                <p><strong>运动时间建议：</strong><br>${exerciseTime}</p>
+                <h3>饮食搭配建议：</h3>
+                <p>${dietSuggestion}</p>
+                <h3>运动类型建议：</h3>
+                <p>${exerciseType}</p>
+                <h3>运动时长建议：</h3>
+                <p>${exerciseDuration}</p>
+                <h3>运动时间建议：</h3>
+                <p>${exerciseTime}</p>
+                <h3>每日任务</h3>
+                <div id="dietTasks">
+                    <h4>饮食任务</h4>
+                    <!-- 这里动态插入饮食任务 -->
+                </div>
+                <div id="exerciseTasks">
+                    <h4>运动任务</h4>
+                    <!-- 这里动态插入运动任务 -->
+                </div>
             `;
+
+            const dietTasksDiv = document.getElementById('dietTasks');
+            const exerciseTasksDiv = document.getElementById('exerciseTasks');
+            dietTasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.classList.add('task');
+                taskElement.textContent = task;
+                taskElement.addEventListener('click', function () {
+                    this.classList.toggle('completed');
+                });
+                dietTasksDiv.appendChild(taskElement);
+            });
+            exerciseTasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.classList.add('task');
+                taskElement.textContent = task;
+                taskElement.addEventListener('click', function () {
+                    this.classList.toggle('completed');
+                });
+                exerciseTasksDiv.appendChild(taskElement);
+            });
+
+            resultDiv.classList.add('show-result');
         });
     </script>
 </body>
