@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>减肥规划器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>减肥规划器</h1>
+    <form id="planForm">
+        <label for="weight">当前体重（kg）</label>
+        <input type="number" id="weight" placeholder="请输入当前体重" required>
+
+        <label for="height">身高（cm）</label>
+        <input type="number" id="height" placeholder="请输入身高" required>
+
+        <label for="age">年龄</label>
+        <input type="number" id="age" placeholder="请输入年龄" required>
+
+        <label for="targetWeight">目标体重（kg）</label>
+        <input type="number" id="targetWeight" placeholder="请输入目标体重" required>
+
+        <label for="time">计划减肥时间（月）</label>
+        <input type="number" id="time" placeholder="请输入计划减肥时间" required>
+
+        <button type="submit">生成减肥规划</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('planForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const age = parseInt(document.getElementById('age').value);
+            const targetWeight = parseFloat(document.getElementById('targetWeight').value);
+            const time = parseInt(document.getElementById('time').value);
+
+            // 计算BMI
+            const bmi = weight / ((height / 100) ** 2);
+
+            // 简单计算每月需减重数
+            const weightToLosePerMonth = (weight - targetWeight) / time;
+
+            let dietSuggestion = "";
+            let exerciseType = "";
+            let exerciseDuration = "";
+            let exerciseTime = "";
+
+            // 根据BMI和减重需求给出饮食建议
+            if (bmi > 28) {
+                dietSuggestion = "建议采用低热量、高纤维饮食，增加蔬菜、水果、全谷物摄入，控制碳水化合物和脂肪摄入，例如早餐可食用燕麦粥、水煮蛋和水果；午餐选择糙米饭、清炒时蔬和瘦肉；晚餐以蔬菜沙拉和清蒸鱼为主。";
+            } else {
+                dietSuggestion = "保持均衡饮食，适当控制热量摄入，多吃富含蛋白质、维生素和矿物质的食物，如鸡胸肉、鱼虾、各类蔬菜和水果。";
+            }
+
+            // 根据年龄和减重需求给出运动建议
+            if (age < 30) {
+                exerciseType = "可以选择高强度间歇训练（HIIT）、力量训练结合有氧运动，如每周进行3次HIIT训练，每次20分钟；2次力量训练，每次30分钟；3次30分钟的慢跑或游泳。";
+            } else if (age < 50) {
+                exerciseType = "推荐有氧运动和适度力量训练，比如每周4次30 - 40分钟的快走、骑自行车或跳绳，2次20分钟的简单力量练习，如平板支撑、深蹲。";
+            } else {
+                exerciseType = "适合较为温和的运动，如每天进行40分钟的散步，每周2 - 3次20分钟的瑜伽或太极拳练习。";
+            }
+
+            // 运动时长和时间安排
+            exerciseDuration = "每次运动时间根据上述建议执行。";
+            exerciseTime = "建议将运动时间分散在一周内，不要集中在某一天，以保持身体的适应性和避免过度疲劳。";
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h2>减肥规划结果</h2>
+                <p><strong>饮食搭配建议：</strong><br>${dietSuggestion}</p>
+                <p><strong>运动类型建议：</strong><br>${exerciseType}</p>
+                <p><strong>运动时长建议：</strong><br>${exerciseDuration}</p>
+                <p><strong>运动时间建议：</strong><br>${exerciseTime}</p>
+            `;
+        });
+    </script>
+</body>
+
+</html>
